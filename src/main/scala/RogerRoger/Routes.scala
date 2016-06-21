@@ -1,11 +1,13 @@
 package RogerRoger
 
 
+import java.net.URLEncoder
 import java.util.concurrent.Executors
 import org.http4s.dsl._
 import org.json4s.jackson.JsonMethods._
 import org.http4s.rho._
-import org.http4s.{UrlForm, HttpService}
+import org.http4s.{HttpService,EntityBody,UrlForm}
+import org.http4s.EntityDecoder
 import org.http4s.server.staticcontent
 import org.http4s.server.staticcontent.ResourceService.Config
 
@@ -20,6 +22,27 @@ class RhoRoutes extends RhoService {
       }
       case "top" => {
         val data = MetricsData.getTopHealth()
+        Ok(pretty(render(data)))
+      }
+      case _ => {
+        val data = MetricsData.getMissingServiceError(service)
+        NotFound(pretty(render(data)))
+      }
+    }
+  }
+  }
+
+  // the stats endpoints for post, to index data
+  POST / "stats" / 'service ^ EntityDecoder.text |>> { (service: String, body: String) => {
+    service match {
+      case "elasticsearch" => {
+        val data = MetricsData.getElasticSearchHealth()
+        MetricsData.persistDocument(data, body)
+        Ok(pretty(render(data)))
+      }
+      case "top" => {
+        val data = MetricsData.getTopHealth()
+        MetricsData.persistDocument(data, body)
         Ok(pretty(render(data)))
       }
       case _ => {

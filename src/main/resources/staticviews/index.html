@@ -1,18 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>RogerRoger</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<p>Welcome to RogerRoger, a lightweight metrics server written in scala.</p>
-<br>
-<p>Try out some endpoints:</p>
-<br>
-<ul>
-    <li><a href="/stats/elasticsearch">Elasticsearch Stats</a></li>
-    <li><a href="/stats/top">Top Stats</a></li>
-</ul>
+<div class="container">
+    <div class="page-header">
+        <h1>Welcome to RogerRoger</h1>
+        <p class="lead">A lightweight metrics server written in scala.</p>
+    </div>
+    <div class="row">
+        <h3>Endpoints Implemented:</h3>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Resource</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>GET</td>
+                <td>stats</td>
+                <td>elasticsearch</td>
+                <td><a href="/stats/elasticsearch">Link</a></td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>stats</td>
+                <td>elasticsearch</td>
+                <td>n/a</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>stats</td>
+                <td>top</td>
+                <td><a href="/stats/top">Link</a></td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>stats</td>
+                <td>top</td>
+                <td>n/a</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script src="static/bootstrap.min.js"></script>
 </body>
 </html>
