@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   "org.scalaz.stream" %% "scalaz-stream" % "0.8",
   "org.json4s" %% "json4s-jackson" % "3.3.0",
   "com.github.dblock" % "oshi-core" % "2.6.1",
-  "com.sksamuel.elastic4s" %% "elastic4s-core" % "1.7.4"
+  "com.sksamuel.elastic4s" %% "elastic4s-core" % "1.7.4",
+  "com.typesafe" % "config" % "1.3.0"
 )
     

@@ -2,14 +2,13 @@ package RogerRoger
 
 import java.util.concurrent.Executors
 
+import com.typesafe.config.ConfigFactory
 import org.http4s.rho.swagger.SwaggerSupport
 import org.http4s.{ Service, HttpService }
 import org.http4s.server.blaze.BlazeBuilder
 import org.http4s.server.ServerBuilder
-
-import scala.util.Properties.envOrNone
-
 import org.log4s.getLogger
+import RogerRoger.conf.AppConfig
 
 
 class RogerRogerApp(host: String, port: Int) {
@@ -40,11 +39,9 @@ class RogerRogerApp(host: String, port: Int) {
 }
 
 object RogerRogerApp {
-  val ip =   "0.0.0.0"
-  val port = 5000 //envOrNone("HTTP_PORT") map(_.toInt) getOrElse(8080)
-
+  val conf = ConfigFactory.load("rogerroger")
   def main(args: Array[String]): Unit = {
-    new RogerRogerApp(ip, port)
+    new RogerRogerApp(AppConfig.Server.hostname, AppConfig.Server.port)
       .build()
       .run
       .awaitShutdown()

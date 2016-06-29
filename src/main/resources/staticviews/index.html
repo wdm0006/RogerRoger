@@ -5,10 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>RogerRoger</title>
-    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
 <div class="container">
     <div class="page-header">
         <h1>Welcome to RogerRoger</h1>
@@ -53,10 +52,48 @@
 
             </tbody>
         </table>
-
+    </div>
+    <div class="row">
+        <h3>Metrics</h3>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Service</th>
+                <th>Metric</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>ElasticSearch</td>
+                <td>elasticsearch_stats.cluster_health.status</td>
+                <td><a href="/metrics/elasticsearch_stats.cluster_health.status">link</a></td>
+            </tr>
+            <tr>
+                <td>ElasticSearch</td>
+                <td>elasticsearch_stats.cluster_stats.indices.docs.count</td>
+                <td><a href="/metrics/elasticsearch_stats.cluster_stats.indices.docs.count">link</a></td>
+            </tr>
+            <tr>
+                <td>ElasticSearch</td>
+                <td>elasticsearch_stats.cluster_stats.indices.store.size_in_bytes</td>
+                <td><a href="/metrics/elasticsearch_stats.cluster_stats.indices.store.size_in_bytes">link</a></td>
+            </tr>
+            <tr>
+                <td>Top</td>
+                <td>top_stats.memory.available</td>
+                <td><a href="/metrics/top_stats.memory.available">link</a></td>
+            </tr>
+            <tr>
+                <td>Top</td>
+                <td>top_stats.cpu.system_load_average</td>
+                <td><a href="/metrics/top_stats.cpu.system_load_average">link</a></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<script src="static/bootstrap.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
 </body>
 </html>

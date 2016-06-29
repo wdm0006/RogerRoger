@@ -1,56 +1,63 @@
 package RogerRoger
 
-
-import java.net.URLEncoder
 import java.util.concurrent.Executors
+import org.http4s.Request
 import org.http4s.dsl._
 import org.json4s.jackson.JsonMethods._
 import org.http4s.rho._
-import org.http4s.{HttpService,EntityBody,UrlForm}
+import org.http4s.HttpService
 import org.http4s.EntityDecoder
 import org.http4s.server.staticcontent
 import org.http4s.server.staticcontent.ResourceService.Config
-
+import RogerRoger.data_stores._
+import RogerRoger.services._
 
 class RhoRoutes extends RhoService {
   // the stats endpoints
-  GET / "stats" / 'service |>> { (service: String) => {
-    service match {
-      case "elasticsearch" => {
-        val data = MetricsData.getElasticSearchHealth()
-        Ok(pretty(render(data)))
-      }
-      case "top" => {
-        val data = MetricsData.getTopHealth()
-        Ok(pretty(render(data)))
-      }
-      case _ => {
-        val data = MetricsData.getMissingServiceError(service)
-        NotFound(pretty(render(data)))
+  GET / "stats" / 'service |>> {
+    (request: Request, service: String) => {
+      val body = "{}"
+      service match {
+        case "elasticsearch" =>
+          val data = ElasticSearchService.getStats()
+          ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
+        case "top" =>
+          val data = TopService.getStats()
+          ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
+        case _ =>
+          val data = TopService.getMissingServiceError(service)
+          NotFound(pretty(render(data)))
       }
     }
-  }
   }
 
   // the stats endpoints for post, to index data
-  POST / "stats" / 'service ^ EntityDecoder.text |>> { (service: String, body: String) => {
-    service match {
-      case "elasticsearch" => {
-        val data = MetricsData.getElasticSearchHealth()
-        MetricsData.persistDocument(data, body)
-        Ok(pretty(render(data)))
-      }
-      case "top" => {
-        val data = MetricsData.getTopHealth()
-        MetricsData.persistDocument(data, body)
-        Ok(pretty(render(data)))
-      }
-      case _ => {
-        val data = MetricsData.getMissingServiceError(service)
-        NotFound(pretty(render(data)))
+  POST / "stats" / 'service ^ EntityDecoder.text |>> {
+    (request: Request, service: String, body: String) => {
+      service match {
+        case "elasticsearch" =>
+          val data = ElasticSearchService.getStats()
+          ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
+        case "top" =>
+          val data = TopService.getStats()
+          ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
+        case _ =>
+          val data = TopService.getMissingServiceError(service)
+          NotFound(pretty(render(data)))
       }
     }
   }
+
+  // the metrics endpoint for getting recent raw data
+  GET / "metrics" / 'metric_name |>> {
+    (request: Request, metric_name: String) => {
+      val data = ElasticSearchStore.getTimeSeriesMetric(metric_name)
+      Ok(pretty(render(data)))
+    }
   }
 }
 
