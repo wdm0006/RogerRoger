@@ -1,62 +1,92 @@
-// Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
+var forceRedraw = function(element){
 
-// Parse the date / time
-var parseDate = d3.time.format("%d-%b-%y").parse;
+    if (!element) { return; }
 
-// Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
+    var n = document.createTextNode(' ');
+    var disp = element.style.display;  // don't worry about previous display style
 
-// Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
+    element.appendChild(n);
+    element.style.display = 'none';
 
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
+    setTimeout(function(){
+        element.style.display = disp;
+        n.parentNode.removeChild(n);
+    },20); // you can play with this timeout to make it as short as possible
+}
 
-// Define the line
-var valueline = d3.svg.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.value); });
+function line_plot(ts_data) {
+    if (ts_data.length > 0) {
+      var keys = [];
+      for (var k in ts_data[0]) {
+        if (k != 'time_stamp') {
+          keys.push(k);
+        }
+      }
+    };
+    var param = keys[0];
+    var x = [];
+    var y = [];
 
-// Adds the svg canvas
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
-
-// Get the data
-d3.json("/metrics/elasticsearch_stats.cluster_stats.indices.docs.count", function(error, data) {
-    console.log(data)
-    data.forEach(function(d) {
-        d.time_stamp = parseDate(d.time_stamp[0]);
-        d.value = d.elasticsearch_stats.cluster_stats.indices.docs.count[0];
+    ts_data.forEach(function(d) {
+        d[param] = d[param][0]
+        d['time_stamp'] = d['time_stamp'][0]
     });
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.value; })]);
+    ts_data = ts_data.map(function(obj) {
+       return {
+          x: obj['time_stamp'],
+          y: obj[param]
+       }
+    });
 
-    // Add the valueline path.
-    svg.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(data));
+    var plot_data = [
+        {
+            values: ts_data,
+            key: param,
+            color: '#ff7f0e'
+        }
+    ];
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+    return plot_data
+};
 
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+function parse_fn(data) {
+    var plot_data = line_plot(data);
+    console.log(plot_data);
 
-});
+    // form the div as we want to
+    var div_id = plot_data[0].key;
+    div_id = div_id.replace(/\W/g, '')
+
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+                    .useInteractiveGuideline(true);
+
+        // set the x-axis to be time series
+        chart.xAxis
+          .tickFormat(function(d) {
+            return d3.time.format('%x')(new Date(d))
+        });
+
+        // only show 2 digit precision on y-axis
+        chart.yAxis.tickFormat(d3.format(',.2f'));
+
+        d3.select('#' + div_id + ' svg')
+           .datum(plot_data)
+           .transition()
+           .duration(500)
+           .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });
+};
+
+d3_queue.queue()
+    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count")
+    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count")
+    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.store.size_in_bytes")
+    .defer(d3.json, "/metrics/top_stats.memory.available")
+    .defer(d3.json, "/metrics/top_stats.cpu.system_load_average")
+    .await(parse_fn)
+

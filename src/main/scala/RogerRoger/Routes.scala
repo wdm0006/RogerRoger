@@ -72,11 +72,15 @@ class Routes {
     /* Routes for getting static resources. These might be served more efficiently by apache2 or nginx,
      * but its nice to keep the demo self contained */
 
-    // if the route starts with /statuc, then just serve whatever path it is as a static file
-    case r @ GET -> _ if r.pathInfo.startsWith("/static") => static(r)
+    // if the route starts with /static, then just serve whatever path it is as a static file
+    case r @ GET -> _ if r.pathInfo.startsWith("/static") => {
+      static(r)
+    }
 
     // if a directory gets passed, instead of a file, append index.html and try to serve that.
-    case r @ GET -> _ if r.pathInfo.endsWith("/") => service(r.withPathInfo(r.pathInfo + "index.html"))
+    case r @ GET -> _ if r.pathInfo.endsWith("/") => {
+      service(r.withPathInfo(r.pathInfo + "index.html"))
+    }
 
     // if there isn't an extension but it's not a directory, append .html and try to serve it, otherwise just serve
     case r @ GET -> _ =>
