@@ -9,6 +9,7 @@ import org.http4s.server.blaze.BlazeBuilder
 import org.http4s.server.ServerBuilder
 import org.log4s.getLogger
 import RogerRoger.conf.AppConfig
+import RogerRoger.schedulers.{SelfReferencingScheduler,CleanupScheduler}
 
 
 class RogerRogerApp(host: String, port: Int) {
@@ -39,6 +40,13 @@ class RogerRogerApp(host: String, port: Int) {
 }
 
 object RogerRogerApp {
+  // start up the self-referencing scheduler
+  val self_ping_scheduler = SelfReferencingScheduler
+  self_ping_scheduler.schedule_message("test", 30)
+  val cleanup_scheduler = CleanupScheduler
+  cleanup_scheduler.schedule_message("test", 30)
+
+  // start up the app itself
   val conf = ConfigFactory.load("rogerroger")
   def main(args: Array[String]): Unit = {
     new RogerRogerApp(AppConfig.Server.hostname, AppConfig.Server.port)

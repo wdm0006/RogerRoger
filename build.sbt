@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-jackson" % "3.3.0",
   "com.github.dblock" % "oshi-core" % "2.6.1",
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "1.7.4",
-  "com.typesafe" % "config" % "1.3.0"
+  "com.typesafe" % "config" % "1.3.0",
+  "com.typesafe.akka" %% "akka-actor" % "2.4.1"
 )
     

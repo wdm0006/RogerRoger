@@ -3,6 +3,8 @@ package RogerRoger
 import java.util.concurrent.Executors
 import org.http4s.Request
 import org.http4s.dsl._
+import org.json4s._
+import org.json4s.JsonDSL.WithDouble._
 import org.json4s.jackson.JsonMethods._
 import org.http4s.rho._
 import org.http4s.HttpService
@@ -25,6 +27,12 @@ class RhoRoutes extends RhoService {
         case "top" =>
           val data = TopService.getStats()
           ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
+        case "options" =>
+          val data = ("services" -> List(
+            "/stats/elasticsearch",
+            "/stats/top"
+          ))
           Ok(pretty(render(data)))
         case _ =>
           val data = TopService.getMissingServiceError(service)

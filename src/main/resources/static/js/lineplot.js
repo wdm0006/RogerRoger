@@ -51,6 +51,8 @@ function line_plot(ts_data) {
 };
 
 function parse_fn(data) {
+    console.log('entered parse')
+    console.log(data);
     var plot_data = line_plot(data);
     console.log(plot_data);
 
@@ -82,11 +84,9 @@ function parse_fn(data) {
     });
 };
 
-d3_queue.queue()
-    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count")
-    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count")
-    .defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.store.size_in_bytes")
-    .defer(d3.json, "/metrics/top_stats.memory.available")
-    .defer(d3.json, "/metrics/top_stats.cpu.system_load_average")
-    .await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.store.size_in_bytes").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/top_stats.memory.available").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/top_stats.cpu.system_load_average").await(parse_fn)
+
 

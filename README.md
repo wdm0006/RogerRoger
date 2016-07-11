@@ -7,6 +7,7 @@ Mostly a vehicle for learning about some new datastores and Scala.
 
 TODO:
 
- * add endpoint to query recent data for a single metric
- * make simple page listing optional metrics
- * make js page for plotting that single metric
+ * Add endpoint that returns possible endpoints for querying data (es and top right now)
+ * Add cleanup scheduler that reaps data by query older than a certain date (TTL logic)
+ * Add self referencing scheduler that pings the localhost endpoints on a schedule to populate data
+ * Add html page to render the local configuration for the runtime

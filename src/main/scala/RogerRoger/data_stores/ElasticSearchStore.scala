@@ -1,5 +1,6 @@
 package RogerRoger.data_stores
 
+import org.elasticsearch.search.SearchHit
 import org.json4s._
 import org.json4s.JsonDSL.WithDouble._
 import org.json4s.jackson.JsonMethods._
@@ -18,17 +19,8 @@ object ElasticSearchStore {
 
   def persistDocument(metrics_doc: JValue, request_body: String) = {
     val request = parse(request_body)
-
-    // TODO: check the config info for which datastore to use here
-    val data_store = "elasticsearch"
-
-    // some data can be passed through to the doc dumbly
     val pass_thru = (request \ "pass_thru").extract[JValue]
-
-    data_store match {
-      case "elasticsearch" => indexDocument(metrics_doc merge pass_thru)
-      case _ => println(compact(render(metrics_doc merge pass_thru)))
-    }
+    indexDocument(metrics_doc merge pass_thru)
   }
 
   def indexDocument(metrics_doc: JValue) = {
@@ -73,5 +65,34 @@ object ElasticSearchStore {
     } catch {
       case err: Throwable => ("error" -> err.toString) ~ ("status" -> 500)
     }
+  }
+
+  def cleanupLog(window: Int) = {
+    // deletes all documents older than window seconds from the index
+    // setup a rest client and issue the request
+    val settings = ImmutableSettings.settingsBuilder().put("cluster.name", AppConfig.DataStores.ElasticSearch.cluster_name).build()
+    val client = ElasticClient.remote(settings, ElasticsearchClientUri(AppConfig.DataStores.ElasticSearch.uri))
+
+    // setup the mapping and index from config
+    val mapping_ = AppConfig.DataStores.ElasticSearch.mapping
+    val index_ = AppConfig.DataStores.ElasticSearch.index
+
+    val limit_ts = (System.currentTimeMillis / 1000) - window
+
+    val ids = client.execute {
+      search in index_ -> mapping_ query {
+        filteredQuery query {
+          matchAllQuery
+        } filter {
+          rangeFilter("time_stamp") to limit_ts
+        }
+      }
+    }.await.getHits.hits()
+
+    // form a container of bulk delete queries
+    val bulk_deletes = ids.map {x: SearchHit =>
+      delete id x.id from index_ / mapping_
+    }
+    client.execute { bulk (bulk_deletes) }
   }
 }

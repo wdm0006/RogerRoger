@@ -41,4 +41,14 @@ object AppConfig {
       lazy val mapping = getStringOr("data_stores.elasticsearch.mapping", "metrics")
     }
   }
+
+  object Schedulers {
+    object SelfReferencingScheduler {
+      lazy val interval_seconds = getIntOr("self_referencing_scheduler.interval_seconds", 60)
+    }
+    object CleanupScheduler {
+      lazy val interval_seconds = getIntOr("cleanup_scheduler.interval_seconds", 60)
+      lazy val retained_window_seconds = getIntOr("cleanup_scheduler.retained_window_seconds", 3600 * 24 * 7)
+    }
+  }
 }
