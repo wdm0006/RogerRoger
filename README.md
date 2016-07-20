@@ -3,7 +3,8 @@ RogerRoger
 
 A simple API to serve out health information for a running system. Optionally persists data into elasticsearch.  
 
-Mostly a vehicle for learning about some new datastores and Scala.
+Mostly a vehicle for learning about Scala.  At any given time, probably doesn't work, fair 
+warning.
 
 TODO:
 

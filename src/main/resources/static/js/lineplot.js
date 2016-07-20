@@ -59,15 +59,24 @@ function parse_fn(data) {
     // form the div as we want to
     var div_id = plot_data[0].key;
     div_id = div_id.replace(/\W/g, '')
+    var width = 800, height = 300;
 
     nv.addGraph(function() {
         var chart = nv.models.lineChart()
+                    .margin({
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 100
+                    })
+                    .width(width)
+                    .height(height)
                     .useInteractiveGuideline(true);
 
         // set the x-axis to be time series
         chart.xAxis
           .tickFormat(function(d) {
-            return d3.time.format('%x')(new Date(d))
+            return d3.time.format('%d/%m %H:%M:%S')(new Date(d * 1000))
         });
 
         // only show 2 digit precision on y-axis
@@ -77,7 +86,8 @@ function parse_fn(data) {
            .datum(plot_data)
            .transition()
            .duration(500)
-           .call(chart);
+           .call(chart)
+           .style({ 'width': width, 'height': height });
 
         nv.utils.windowResize(chart.update);
         return chart;
