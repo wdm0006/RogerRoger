@@ -21,11 +21,11 @@ class RhoRoutes extends RhoService {
       val body = "{}"
       service match {
         case "elasticsearch" =>
-          val data = ElasticSearchService.getStats()
+          val data = ElasticSearchService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
         case "top" =>
-          val data = TopService.getStats()
+          val data = TopService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
         case "options" =>
@@ -46,11 +46,11 @@ class RhoRoutes extends RhoService {
     (request: Request, service: String, body: String) => {
       service match {
         case "elasticsearch" =>
-          val data = ElasticSearchService.getStats()
+          val data = ElasticSearchService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
         case "top" =>
-          val data = TopService.getStats()
+          val data = TopService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
         case _ =>

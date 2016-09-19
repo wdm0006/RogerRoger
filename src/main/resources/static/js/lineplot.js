@@ -94,9 +94,9 @@ function parse_fn(data) {
     });
 };
 
-d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.docs.count").await(parse_fn)
-d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats.cluster_stats.indices.store.size_in_bytes").await(parse_fn)
-d3_queue.queue().defer(d3.json, "/metrics/top_stats.memory.available").await(parse_fn)
-d3_queue.queue().defer(d3.json, "/metrics/top_stats.cpu.system_load_average").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats_cluster_stats_indices_docs_count").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/elasticsearch_stats_cluster_stats_indices_store_size_in_bytes").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/top_stats_memory_available").await(parse_fn)
+d3_queue.queue().defer(d3.json, "/metrics/top_stats_cpu_system_load_average").await(parse_fn)
 
 

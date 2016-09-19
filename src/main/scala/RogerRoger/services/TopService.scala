@@ -18,24 +18,23 @@ object TopService {
     response merge status merge data
   }
 
-  def getStats(): JValue = {
+  def getStats: JValue = {
     val startTime = System.currentTimeMillis
 
     val data =
-        ("top_stats.memory.available" -> hal.getMemory.getAvailable) ~
-        ("top_stats.memory.total" -> hal.getMemory.getTotal) ~
-        ("top_stats.memory.swap_total" -> hal.getMemory.getSwapTotal) ~
-        ("top_stats.memory.swap_used" -> hal.getMemory.getSwapUsed) ~
-        ("top_stats.cpu.name" -> hal.getProcessor.getName) ~
-        ("top_stats.cpu.physical_processor_count" -> hal.getProcessor.getPhysicalProcessorCount) ~
-        ("top_stats.cpu.process_count" -> hal.getProcessor.getProcessCount) ~
-        ("top_stats.cpu.logical_processor_count" -> hal.getProcessor.getLogicalProcessorCount) ~
-        ("top_stats.cpu.model" -> hal.getProcessor.getModel) ~
-        ("top_stats.cpu.thread_count" -> hal.getProcessor.getThreadCount) ~
-        ("top_stats.cpu.cpu_load" -> hal.getProcessor.getSystemCpuLoad) ~
-        ("top_stats.cpu.system_load_average" -> hal.getProcessor.getSystemLoadAverage) ~
-        ("top_stats.cpu.system_io_wait_ticks" -> hal.getProcessor.getSystemIOWaitTicks)
-
+        ("top_stats_memory_available" -> hal.getMemory.getAvailable) ~
+        ("top_stats_memory_total" -> hal.getMemory.getTotal) ~
+        ("top_stats_memory_swap_total" -> hal.getMemory.getSwapTotal) ~
+        ("top_stats_memory_swap_used" -> hal.getMemory.getSwapUsed) ~
+        ("top_stats_cpu_name" -> hal.getProcessor.getName) ~
+        ("top_stats_cpu_physical_processor_count" -> hal.getProcessor.getPhysicalProcessorCount) ~
+        ("top_stats_cpu_process_count" -> hal.getProcessor.getProcessCount) ~
+        ("top_stats_cpu_logical_processor_count" -> hal.getProcessor.getLogicalProcessorCount) ~
+        ("top_stats_cpu_model" -> hal.getProcessor.getModel) ~
+        ("top_stats_cpu_thread_count" -> hal.getProcessor.getThreadCount) ~
+        ("top_stats_cpu_cpu_load" -> hal.getProcessor.getSystemCpuLoad) ~
+        ("top_stats_cpu_system_load_average" -> hal.getProcessor.getSystemLoadAverage) ~
+        ("top_stats_cpu_system_io_wait_ticks" -> hal.getProcessor.getSystemIOWaitTicks)
 
     val status =
       ("service_response" -> 200) ~

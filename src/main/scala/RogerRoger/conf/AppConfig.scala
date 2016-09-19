@@ -45,6 +45,7 @@ object AppConfig {
   object Schedulers {
     object SelfReferencingScheduler {
       lazy val interval_seconds = getIntOr("self_referencing_scheduler.interval_seconds", 60)
+      lazy val base_url = getStringOr("self_referencing_scheduler.base_url", "http://localhost:5000")
     }
     object CleanupScheduler {
       lazy val interval_seconds = getIntOr("cleanup_scheduler.interval_seconds", 60)

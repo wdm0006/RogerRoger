@@ -1,11 +1,12 @@
 package RogerRoger.schedulers
 
+import RogerRoger.conf.AppConfig
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import akka.actor._
 import scala.concurrent.duration._
 
-class Supervisor extends Actor {
+class PingSupervisor extends Actor {
   import akka.util.Timeout
   import akka.actor.OneForOneStrategy
   import akka.actor.SupervisorStrategy._
@@ -23,9 +24,16 @@ class Supervisor extends Actor {
 
   def receive = {
     case message: String => {
-      val pinger = context.actorOf(Props[LocalPingActor], "LocalPingActor")
-      pinger ! message
-      // todo kill
+      if (message == "local") {
+        val pinger = context.actorOf(Props[LocalPingActor], "LocalPingActor")
+        pinger ! message
+        pinger ! PoisonPill
+      } else if (message == "random") {
+        // todo, pick a host out of the data
+        println(s"couldn't parse message: $message")
+      } else {
+        println(s"couldn't parse message: $message")
+      }
     }
   }
 }
@@ -37,19 +45,18 @@ class LocalPingActor extends Actor {
   def receive = {
     case _ => {
       implicit lazy val formats = org.json4s.DefaultFormats
-      // todo pass in the hostname and port here from config
-      val base_url = "http://localhost:5000"
+      val base_url = AppConfig.Schedulers.SelfReferencingScheduler.base_url
       val options = parse(scala.io.Source.fromURL(base_url + "/stats/options").mkString) \ "services"
       val options_cont = options.extract[Seq[String]]
-      options_cont.foreach{x: String =>
-        try {
-          val content = get(base_url + x)
-          println("ping")
-        } catch {
-          case ioe: java.io.IOException =>  println("java io exception")
-          case ste: java.net.SocketTimeoutException => println("socket timeout exception")
-          case jns: java.net.SocketException => println("socket exception")
-          case _: Throwable => println("some kind of issue calling the ping")
+      options_cont.foreach { x: String => {
+          try {
+            val content = get(base_url + x)
+          } catch {
+            case ioe: java.io.IOException => println("java io exception")
+            case ste: java.net.SocketTimeoutException => println("socket timeout exception")
+            case jns: java.net.SocketException => println("socket exception")
+            case _: Throwable => println("some kind of issue calling the ping")
+          }
         }
       }
     }
@@ -60,7 +67,7 @@ class LocalPingActor extends Actor {
 object SelfReferencingScheduler {
   // setting up the overall system
   val system = ActorSystem("SelfReferencingSystem")
-  val supervisor = system.actorOf(Props[Supervisor], "local_ping_supervisor")
+  val supervisor = system.actorOf(Props[PingSupervisor], "local_ping_supervisor")
 
   def schedule_message(message: String, interval: Int) = {
     import system.dispatcher
