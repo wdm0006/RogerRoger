@@ -3,9 +3,8 @@ package RogerRoger
 import java.util.concurrent.Executors
 import org.http4s.Request
 import org.http4s.dsl._
-import org.json4s._
-import org.json4s.JsonDSL.WithDouble._
-import org.json4s.jackson.JsonMethods._
+import RogerRoger.conf.AppConfig
+
 import org.http4s.rho._
 import org.http4s.HttpService
 import org.http4s.EntityDecoder
@@ -13,6 +12,10 @@ import org.http4s.server.staticcontent
 import org.http4s.server.staticcontent.ResourceService.Config
 import RogerRoger.data_stores._
 import RogerRoger.services._
+
+import org.json4s._
+import org.json4s.JsonDSL.WithDouble._
+import org.json4s.jackson.JsonMethods._
 
 class RhoRoutes extends RhoService {
   // the stats endpoints
@@ -28,12 +31,18 @@ class RhoRoutes extends RhoService {
           val data = TopService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
-        case "options" =>
-          val data = ("services" -> List(
-            "/stats/elasticsearch",
-            "/stats/top"
-          ))
+        case "rabbitmq" =>
+          val data = RabbitMQService.getStats
+          ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
+        case "options" => {
+          var services_list = AppConfig.Services.services
+          services_list = services_list.map {
+            x: String => "/stats/".concat(x)
+          }
+          val data = ("services" -> services_list)
+          Ok(pretty(render(data)))
+        }
         case _ =>
           val data = TopService.getMissingServiceError(service)
           NotFound(pretty(render(data)))

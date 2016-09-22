@@ -1,5 +1,6 @@
 package RogerRoger.conf
 
+import collection.JavaConversions._
 import com.typesafe.config.ConfigFactory
 
 object AppConfig {
@@ -27,9 +28,15 @@ object AppConfig {
   }
 
   object Services {
+    lazy val services = config.getStringList("services.services").toList
     object ElasticSearch {
       lazy val cluster_name = getStringOr("services.elasticsearch.cluster_name", "elasticsearch")
       lazy val uri = getStringOr("services.elasticsearch.uri", "elasticsearch://localhost:9300")
+    }
+    object RabbitMQ {
+      lazy val port = getStringOr("services.rabbitmq.port", "15627")
+      lazy val username = getStringOr("services.rabbitmq.username", "guest")
+      lazy val password = getStringOr("services.rabbitmq.password", "guest")
     }
   }
 

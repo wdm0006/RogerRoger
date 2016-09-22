@@ -26,10 +26,10 @@ Mostly a vehicle for learning about Scala.  At any given time, it may not work, 
 
 TODO:
 
- * Add endpoint that returns possible endpoints for querying data (es and top right now)
  * Add html page to render the local configuration for the runtime
  * RandomPing scheduler
  * Fix lineplots page (nothing is rendering)
  * Add RabbitMQ service
+ * Config-ify datastore
  * Add PostgreSQL service
  * Add PostgreSQL data store
