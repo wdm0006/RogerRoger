@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "com.github.dblock" % "oshi-core" % "2.6.1",
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.3.0",
   "com.typesafe" % "config" % "1.3.0",
-  "com.typesafe.akka" %% "akka-actor" % "2.4.1"
+  "com.typesafe.akka" %% "akka-actor" % "2.4.1",
+  "net.databinder" %% "dispatch-http" % "0.8.10"
 )
     

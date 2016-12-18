@@ -62,6 +62,10 @@ class RhoRoutes extends RhoService {
           val data = TopService.getStats
           ElasticSearchStore.persistDocument(data, body)
           Ok(pretty(render(data)))
+        case "rabbitmq" =>
+          val data = RabbitMQService.getStats
+          ElasticSearchStore.persistDocument(data, body)
+          Ok(pretty(render(data)))
         case _ =>
           val data = TopService.getMissingServiceError(service)
           NotFound(pretty(render(data)))
