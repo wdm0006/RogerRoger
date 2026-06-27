@@ -34,7 +34,8 @@ object AppConfig {
       lazy val uri = getStringOr("services.elasticsearch.uri", "elasticsearch://localhost:9300")
     }
     object RabbitMQ {
-      lazy val port = getStringOr("services.rabbitmq.port", "15627")
+      lazy val host = getStringOr("services.rabbitmq.host", "localhost")
+      lazy val port = getStringOr("services.rabbitmq.port", "15672")
       lazy val username = getStringOr("services.rabbitmq.username", "guest")
       lazy val password = getStringOr("services.rabbitmq.password", "guest")
     }
