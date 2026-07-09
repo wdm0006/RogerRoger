@@ -42,11 +42,11 @@ class RogerRogerApp(host: String, port: Int) {
 object RogerRogerApp {
   // start up the self-referencing scheduler
   val self_ping_scheduler = SelfReferencingScheduler
-  self_ping_scheduler.schedule_message("local", 30)
+  self_ping_scheduler.schedule_message("local", AppConfig.Schedulers.SelfReferencingScheduler.interval_seconds)
 
   // start up the cleanup scheduler
   val cleanup_scheduler = CleanupScheduler
-  cleanup_scheduler.schedule_message("nil", 300)
+  cleanup_scheduler.schedule_message("nil", AppConfig.Schedulers.CleanupScheduler.interval_seconds)
 
   // start up the app itself
   val conf = ConfigFactory.load("rogerroger")

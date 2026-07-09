@@ -2,6 +2,7 @@ package RogerRoger.schedulers
 
 import akka.actor._
 import scala.concurrent.duration._
+import RogerRoger.conf.AppConfig
 import RogerRoger.data_stores._
 
 class CleanupSupervisor extends Actor {
@@ -32,7 +33,7 @@ class CleanupSupervisor extends Actor {
 class CleanupActor extends Actor {
   def receive = {
     case _ => {
-      ElasticSearchStore.cleanupLog(3600 * 6)
+      ElasticSearchStore.cleanupLog(AppConfig.Schedulers.CleanupScheduler.retained_window_seconds)
     }
   }
 }
