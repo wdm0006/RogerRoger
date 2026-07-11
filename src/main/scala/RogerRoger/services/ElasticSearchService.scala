@@ -11,6 +11,13 @@ import RogerRoger.conf.AppConfig
 object ElasticSearchService {
   implicit val formats = DefaultFormats
 
+  // one shared transport client for the object lifetime (mirrors ElasticSearchStore)
+  private lazy val settings = Settings.settingsBuilder().put(
+    "cluster.name",
+    AppConfig.Services.ElasticSearch.cluster_name
+  ).build()
+  private lazy val client = ElasticClient.transport(settings, ElasticsearchClientUri(AppConfig.Services.ElasticSearch.uri))
+
   def wrapData(data: JValue, status: JValue): JValue = {
     val response =
       ("time_stamp" -> System.currentTimeMillis / 1000) ~ ("service" -> "elasticsearch")
@@ -20,13 +27,7 @@ object ElasticSearchService {
   def getStats: JValue = {
     val startTime = System.currentTimeMillis
     try {
-      // setup a rest client and issue the request
-      val settings = Settings.settingsBuilder().put(
-        "cluster.name",
-        AppConfig.Services.ElasticSearch.cluster_name
-      ).build()
-
-      val client = ElasticClient.transport(settings, ElasticsearchClientUri(AppConfig.Services.ElasticSearch.uri))
+      // reuse the shared transport client and issue the request
       val es_health = parse(client.execute { get cluster health }.await.toString)
       val es_stats = parse(client.execute { get cluster stats }.await.toString)
 
