@@ -71,21 +71,28 @@ object ElasticSearchStore {
   def cleanupLog(window: Int) = {
     // deletes all documents older than window seconds from the index
     val limit_ts = (System.currentTimeMillis / 1000) - window
+    val limit_val = 1000
 
-    val ids = client.execute {
-      search in index_ -> mapping_ query {
-        bool {
-          must(
-            rangeQuery("time_stamp") to limit_ts
-          )
-        }
+    try {
+      val ids = client.execute {
+        search in index_ -> mapping_ query {
+          bool {
+            must(
+              rangeQuery("time_stamp") to limit_ts
+            )
+          }
+        } limit limit_val
+       }.await.getHits.hits()
+
+      // form a container of bulk delete queries
+      val bulk_deletes = ids.map {x: SearchHit =>
+        delete id x.id from index_ / mapping_
       }
-     }.await.getHits.hits()
-
-    // form a container of bulk delete queries
-    val bulk_deletes = ids.map {x: SearchHit =>
-      delete id x.id from index_ / mapping_
+      if (bulk_deletes.nonEmpty) {
+        client.execute { bulk (bulk_deletes) }.await
+      }
+    } catch {
+      case err: Throwable => println(err.toString)
     }
-    client.execute { bulk (bulk_deletes) }
   }
 }
