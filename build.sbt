@@ -23,6 +23,6 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.3.0",
   "com.typesafe" % "config" % "1.3.0",
   "com.typesafe.akka" %% "akka-actor" % "2.4.1",
-  "net.databinder" %% "dispatch-http" % "0.8.10"
+  "net.databinder" %% "dispatch-http" % "0.8.10",
+  "org.scalatest" %% "scalatest" % "3.0.5" % Test
 )
-    
