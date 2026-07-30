@@ -44,7 +44,7 @@ object ElasticSearchService {
       wrapData(data, status)
     } catch {
       case err: Throwable =>
-        val data = parse("[]")
+        val data = parse("{}")
         val status =
           ("service_response" -> 404) ~
           ("took" -> (System.currentTimeMillis - startTime)) ~
