@@ -40,13 +40,13 @@ class PingSupervisor extends Actor {
 
 class LocalPingActor extends Actor {
   @throws(classOf[java.io.IOException])
-  def get(url: String) = scala.io.Source.fromURL(url)
+  def get(url: String): String = LocalPingActor.consume(scala.io.Source.fromURL(url))
 
   def receive = {
     case _ => {
       implicit lazy val formats = org.json4s.DefaultFormats
       val base_url = AppConfig.Schedulers.SelfReferencingScheduler.base_url
-      val options = parse(scala.io.Source.fromURL(base_url + "/stats/options").mkString) \ "services"
+      val options = parse(get(base_url + "/stats/options")) \ "services"
       val options_cont = options.extract[Seq[String]]
       options_cont.foreach { x: String => {
           try {
@@ -63,6 +63,12 @@ class LocalPingActor extends Actor {
   }
 }
 
+object LocalPingActor {
+  def consume(open: => scala.io.Source): String = {
+    val source = open
+    try source.mkString finally source.close()
+  }
+}
 
 object SelfReferencingScheduler {
   // setting up the overall system
