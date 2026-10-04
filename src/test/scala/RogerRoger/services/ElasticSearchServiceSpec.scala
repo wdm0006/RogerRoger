@@ -17,7 +17,7 @@ class ElasticSearchServiceSpec extends FunSuite {
     val service_response = (result \ "service_response").extract[Int]
     if (service_response === 404) {
       assert((result \ "description") !== JNothing)
-      assert((result \ "stacktrace").extract[String].nonEmpty)
+      assert((result \ "stacktrace") === JNothing)
     } else {
       assert(service_response === 200)
       assert((result \ "elasticsearch_stats_cluster_health_status") !== JNothing)

@@ -6,6 +6,7 @@ import org.json4s.jackson.JsonMethods._
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ElasticClient,ElasticsearchClientUri}
 import org.elasticsearch.common.settings.Settings
+import org.log4s.getLogger
 import RogerRoger.conf.AppConfig
 
 object ElasticSearchService {
@@ -22,6 +23,17 @@ object ElasticSearchService {
     val response =
       ("time_stamp" -> System.currentTimeMillis / 1000) ~ ("service" -> "elasticsearch")
     response merge status merge data
+  }
+
+  private val logger = getLogger
+
+  def errorResponse(err: Throwable, startTime: Long): JValue = {
+    logger.error(err)("elasticsearch stats collection failed")
+    val status =
+      ("service_response" -> 404) ~
+      ("took" -> (System.currentTimeMillis - startTime)) ~
+      ("description" -> "Unable to collect elasticsearch stats")
+    wrapData(parse("{}"), status)
   }
 
   def getStats: JValue = {
@@ -43,14 +55,7 @@ object ElasticSearchService {
         ("took" -> (System.currentTimeMillis - startTime))
       wrapData(data, status)
     } catch {
-      case err: Throwable =>
-        val data = parse("{}")
-        val status =
-          ("service_response" -> 404) ~
-          ("took" -> (System.currentTimeMillis - startTime)) ~
-          ("description" -> err.getMessage) ~
-          ("stacktrace" -> err.getStackTrace.mkString("\n"))
-        wrapData(data, status)
+      case err: Throwable => errorResponse(err, startTime)
     }
   }
 }
