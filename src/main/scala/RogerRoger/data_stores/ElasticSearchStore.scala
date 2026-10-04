@@ -51,7 +51,16 @@ object ElasticSearchStore {
 
   }
 
+  private val MetricNamePattern = "[A-Za-z0-9_.-]+"
+  private val MaxMetricNameLength = 128
+
+  def isValidMetricName(metric_name: String): Boolean =
+    metric_name != null && metric_name.length <= MaxMetricNameLength && metric_name.matches(MetricNamePattern)
+
   def getTimeSeriesMetric(metric_name: String): JValue = {
+    if (!isValidMetricName(metric_name)) {
+      return ("error" -> "invalid metric name") ~ ("status" -> 400)
+    }
     // get some data
     val limit_val = 1000
     try {
