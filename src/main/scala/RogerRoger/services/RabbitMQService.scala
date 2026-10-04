@@ -7,6 +7,7 @@ import dispatch._
 import dispatch.Defaults._
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import org.log4s.getLogger
 import RogerRoger.conf.AppConfig
 
 object RabbitMQService {
@@ -30,6 +31,17 @@ object RabbitMQService {
     parse(response.getResponseBody)
   }
 
+  private val logger = getLogger
+
+  def errorResponse(err: Throwable, startTime: Long): JValue = {
+    logger.error(err)("rabbitmq stats collection failed")
+    val status =
+      ("service_response" -> 404) ~
+      ("took" -> (System.currentTimeMillis - startTime)) ~
+      ("description" -> "Unable to collect rabbitmq stats")
+    wrapData(parse("{}"), status)
+  }
+
   def getStats: JValue = {
     val startTime = System.currentTimeMillis
     try {
@@ -39,14 +51,7 @@ object RabbitMQService {
         ("took" -> (System.currentTimeMillis - startTime))
       wrapData(data, status)
     } catch {
-      case err: Throwable =>
-        val data = parse("{}")
-        val status =
-          ("service_response" -> 404) ~
-          ("took" -> (System.currentTimeMillis - startTime)) ~
-          ("description" -> err.getMessage) ~
-          ("stacktrace" -> err.getStackTrace.mkString("\n"))
-        wrapData(data, status)
+      case err: Throwable => errorResponse(err, startTime)
     }
   }
 }
